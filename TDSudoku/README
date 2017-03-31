@@ -1,0 +1,11 @@
+IDÉE : 
+Faire un objet listof9cell qui regroupe une ligne/ une colonne/ un bloc. 
+Comme ça est fait une fois pour toute puis on a juste à assigner un objet à chaque agent de manière indépendante et ils traiteront direct.
+=> J’ai pas réussi à le faire je suis une merde avec la manipulation d’objets
+
+Comment envoyer à chaque agent un objet « listof9cell » (sont différenciables par le ID)? Où sont-ils répertoriés ?
+
++ faire updateSudokuBehaviour
+Doit : recevoir les messages des AnAgent
+Vérifier si les cell transmises detiennent plus d'info que ce qu'il a déjà
+Si c'est le cas mettre à jour sinon laisser
