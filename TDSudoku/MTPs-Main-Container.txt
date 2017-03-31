@@ -1,1 +1,1 @@
-http://naudinlo-hz-2.etu.utc:7778/acc
+http://192.168.0.119:7778/acc

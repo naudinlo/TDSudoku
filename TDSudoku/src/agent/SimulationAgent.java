@@ -99,6 +99,7 @@ public class SimulationAgent extends Agent {
 				{
 					ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 					message.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
+					message.setConversationId("Ticker");
 					AgentMap.forEach((key,value)->{
 						message.setContent(value);
 						send(message);
@@ -132,8 +133,10 @@ public class SimulationAgent extends Agent {
 				AgentMap.put(AgentMap.size() + 1, content);					
 			}
 			System.out.println("D�but de la simulation");
-
-			//Manque un send message ?
+			ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
+			message1.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
+			message1.setConversationId("Start");
+			send(message1);
 			
 		}
 
