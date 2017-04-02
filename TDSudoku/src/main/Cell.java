@@ -8,11 +8,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.PascalCaseStrategy;
+
 /**
  * @author ia04p007
  *
  */
-public class cell {
+public class Cell {
+	private Integer line;
+	private Integer col;
+	private Integer block;
+	private  Integer possibleValues[];
+	private Integer valeur;
+
 	/**
 	 * @param line
 	 * @param col
@@ -20,18 +28,18 @@ public class cell {
 	 * @param valeur
 	 * @param possibleValues
 	 */
-	public cell(Integer line, Integer col, Integer block, Integer valeur) {
-		super();
-		this.line = line;
-		this.col = col;
-		this.block = block;
-		setValue(valeur);
+//	public Cell(Integer line, Integer col, Integer block, Integer valeur,ArrayList<Integer> vals) {
+//		this.line = line;
+//		this.col = col;
+//		this.block = block;
+//		if(vals != null)
+//			possibleValues = vals;
+//		else
+//
+//		setValue(valeur);
+//	}
+	public Cell() {
 	}
-	private Integer line;
-	private Integer col;
-	private Integer block;
-	private Integer valeur;
-	private  ArrayList<Integer> possibleValues;
 	/**
 	 * @return the line
 	 */
@@ -77,30 +85,27 @@ public class cell {
 	/**
 	 * @param value the value to set
 	 */
+	@SuppressWarnings("null")
 	public void setValue(Integer val) {
 		this.valeur = val;
+		this.possibleValues = new Integer[9];
 		if(val == 0)
-		{
+		{		
 
-			List<Integer> places = Arrays.asList(1,2,3,4,5,6,7,8,9);
-			setPossibleValues((ArrayList<Integer>) places);
+			
+			for (int i = 0; i < 9 ;i++) {
+				possibleValues[i]=i;
+			}
 		}
-		else{
-			this.possibleValues = new ArrayList<>();
-		}
+		
 	}
 	/**
 	 * @return the possibleValues
 	 */
-	public ArrayList<Integer> getPossibleValues() {
+	public Integer[] getPossibleValues() {
 		return possibleValues;
 	}
-	/**
-	 * @param possibleValues the possibleValues to set
-	 */
-	public void setPossibleValues(ArrayList<Integer> possibleValues) {
-		this.possibleValues = possibleValues;
-	}
+
 
 
 

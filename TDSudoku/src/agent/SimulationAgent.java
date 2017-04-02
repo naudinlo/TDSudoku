@@ -14,6 +14,7 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.wrapper.ContainerController;
 
 /**
  * @author ia04p007
@@ -21,7 +22,10 @@ import jade.lang.acl.MessageTemplate;
  */
 public class SimulationAgent extends Agent {
 	private Map<Integer, String> AgentMap;
-
+	public static boolean readyToTick = false;
+	public static int agent_available = 27;
+	private boolean GridIsSet = false;
+	
 	/**
 	 * @param args
 	 */
@@ -35,7 +39,7 @@ public class SimulationAgent extends Agent {
 		AgentMap= new HashMap<Integer, String>();
 		addBehaviour(new registerBehaviour(this, op));
 		addBehaviour(new tickerBehaviour(this, op));
-		addBehaviour(new finishBehaviour(this, op));
+		//addBehaviour(new finishBehaviour(this, op));
 
 
 	}
@@ -82,7 +86,7 @@ public class SimulationAgent extends Agent {
 		 */
 		public tickerBehaviour(SimulationAgent a, String op) {
 			// TODO Auto-generated constructor stub
-			super(a,10000);
+			super(a,2000);
 		}
 
 		/* (non-Javadoc)
@@ -90,21 +94,21 @@ public class SimulationAgent extends Agent {
 		 */
 		@Override
 		protected void onTick() {
+			
 			// TODO Auto-generated method stub
-				if(AgentMap.size() != 27)
-				{
-					this.done();
-				}
-				else 
-				{
-					ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-					message.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
-					message.setConversationId("Ticker");
-					AgentMap.forEach((key,value)->{
-						message.setContent(value);
-						send(message);
-					});
-				}
+			if(GridIsSet == true && readyToTick == true){
+				
+				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+				message.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
+				message.setConversationId("Ticker");
+				AgentMap.forEach((key,value)->{
+					message.setContent(value);
+					send(message);
+				});
+				System.out.println("Fini la distrib");
+				readyToTick = false;
+			}			
+
 		}
 		
 	}
@@ -124,20 +128,46 @@ public class SimulationAgent extends Agent {
 		@Override
 		public void action() {
 			// TODO Auto-generated method stub
+			if(GridIsSet == true)
+			{
+				block();
+			}
+			System.out.println("Agent Registration");
 			ACLMessage message =null;
 			String content;
-			while(message == null && AgentMap.size() <= 27)
-			{
-				message=receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			MessageTemplate mTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM).MatchConversationId("register");
+			message=receive(mTemplate);				
+			if(message != null){			
 				content = message.getContent();
-				AgentMap.put(AgentMap.size() + 1, content);					
+				AgentMap.put(AgentMap.size() + 1, content);	
 			}
-			System.out.println("D�but de la simulation");
-			ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
-			message1.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
-			message1.setConversationId("Start");
-			send(message1);
+		
+			if(AgentMap.size() == 27 && GridIsSet == false)
+			{
+				System.out.println("Agent Registration Done");
+
+				ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
+				message1.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
+				message1.setConversationId("Start");
+				System.out.println("Creation Grille");
+				send(message1);
 			
+			
+			
+			MessageTemplate mTemplate2=MessageTemplate.MatchPerformative(ACLMessage.CONFIRM).MatchConversationId("Start");
+			ACLMessage responseFromEnvAgent = receive(mTemplate2);
+			if(responseFromEnvAgent != null)
+			{
+				System.out.println("Création de la grille Done: Début de la simulation");
+				GridIsSet = true;
+				readyToTick = true;
+				block();			
+			}
+			
+			block();			
+			}
+			
+
 		}
 
 		/* (non-Javadoc)
