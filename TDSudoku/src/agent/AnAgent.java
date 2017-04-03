@@ -2,6 +2,9 @@ package agent;
 
 import java.io.IOException;
 import java.security.acl.Acl;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,14 +45,19 @@ public class calculateBehaviour extends Behaviour{
 		MessageTemplate mTemplate = MessageTemplate.MatchConversationId(getLocalName()).MatchPerformative(ACLMessage.REQUEST);
 		ACLMessage message_from_env = receive(mTemplate);
 		if(message_from_env != null){
-			System.out.println("Je suis l'agent "+getLocalName());
 			ObjectMapper mapper = new ObjectMapper();
 
 			try {
 				String content =message_from_env.getContent();
-
-				Cell[] cellule  = mapper.readValue(content, Cell[].class);
-				System.out.println("Réussi");
+//				System.out.println(content);
+				Cell[] cellules  = mapper.readValue(content, Cell[].class);
+				cellules = findCommonValuesForCells(cellules);
+			
+				String content_to_send =mapper.writeValueAsString(cellules); 
+				ACLMessage reply_to_env = message_from_env.createReply();
+				reply_to_env.setPerformative(ACLMessage.CONFIRM);
+				reply_to_env.setContent(content_to_send );
+				send(reply_to_env);
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -61,6 +69,46 @@ public class calculateBehaviour extends Behaviour{
 		}
 	
 		
+	}
+
+	private Cell[] findCommonValuesForCells(Cell[] cellule) {
+		// TODO Auto-generated method stub
+		Integer value_prec[] = new Integer[9];
+		for (int i = 0; i < value_prec.length; i++) {
+			value_prec[i]=i+1;
+		}
+		
+		//System.out.println("Calculs des cell de l'agent "+getLocalName());
+		for (int i = 0; i < cellule.length; i++) {
+			Integer values_to_test[]=  cellule[i].getPossibleValues();
+			if(values_to_test[0] == null)
+			{
+				Set<Integer> s1 = new HashSet<Integer>();
+
+				for (int j = 1; j <= 9; j++) {
+					if(j != cellule[i].getValue())
+						s1.add(j);
+				}
+				values_to_test = s1.toArray(new Integer[s1.size()]);
+				
+			}
+		
+				Set<Integer> s1 = new HashSet<Integer>(Arrays.asList(value_prec));
+				Set<Integer> s2 = new HashSet<Integer>(Arrays.asList(values_to_test));
+				s1.retainAll(s2);
+				
+				value_prec = s1.toArray(new Integer[s1.size()]);
+
+			
+		}
+		Set<Integer> s1 = new HashSet<Integer>(Arrays.asList(value_prec));
+		for (int i = 0; i < cellule.length; i++) {
+			if(cellule[i].getValue() == 0)
+			{
+			cellule[i].setPossibleValues(value_prec);
+			}
+		}
+		return cellule;
 	}
 
 	@Override

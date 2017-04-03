@@ -18,7 +18,7 @@ public class Cell {
 	private Integer line;
 	private Integer col;
 	private Integer block;
-	private  Integer possibleValues[];
+	private  Integer possibleValues[] = new Integer[9];
 	private Integer valeur;
 
 	/**
@@ -88,15 +88,8 @@ public class Cell {
 	@SuppressWarnings("null")
 	public void setValue(Integer val) {
 		this.valeur = val;
-		this.possibleValues = new Integer[9];
-		if(val == 0)
-		{		
-
-			
-			for (int i = 0; i < 9 ;i++) {
-				possibleValues[i]=i;
-			}
-		}
+		//this.possibleValues = new Integer[9];
+	
 		
 	}
 	/**
@@ -104,6 +97,10 @@ public class Cell {
 	 */
 	public Integer[] getPossibleValues() {
 		return possibleValues;
+	}
+	public void setPossibleValues(Integer[] value_prec) {
+		// TODO Auto-generated method stub
+		this.possibleValues = value_prec;
 	}
 
 

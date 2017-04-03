@@ -23,8 +23,8 @@ import jade.wrapper.ContainerController;
 public class SimulationAgent extends Agent {
 	private Map<Integer, String> AgentMap;
 	public static boolean readyToTick = false;
-	public static int agent_available = 27;
-	private boolean GridIsSet = false;
+	public static boolean GridIsSet = false;
+	public static boolean isFinished = false;
 	
 	/**
 	 * @param args
@@ -39,7 +39,7 @@ public class SimulationAgent extends Agent {
 		AgentMap= new HashMap<Integer, String>();
 		addBehaviour(new registerBehaviour(this, op));
 		addBehaviour(new tickerBehaviour(this, op));
-		//addBehaviour(new finishBehaviour(this, op));
+		addBehaviour(new finishBehaviour(this, op));
 
 
 	}
@@ -60,12 +60,14 @@ public class SimulationAgent extends Agent {
 		public void action() {
 			// TODO Auto-generated method stub
 			ACLMessage message =null;
-			String content;
-			message=receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM).MatchConversationId("Finish"));
+			message=receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM).MatchConversationId("End"));
 
 			if(message != null)
 			{
-				System.out.println("Fin de la simulation");
+				System.out.println("Sudoku Résolu ! \n"+message.getContent());
+			}
+			else {
+				block();
 			}
 		}
 
@@ -97,7 +99,7 @@ public class SimulationAgent extends Agent {
 			
 			// TODO Auto-generated method stub
 			if(GridIsSet == true && readyToTick == true){
-				
+				System.out.println("C'est parti \n");
 				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 				message.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
 				message.setConversationId("Ticker");
@@ -105,7 +107,7 @@ public class SimulationAgent extends Agent {
 					message.setContent(value);
 					send(message);
 				});
-				System.out.println("Fini la distrib");
+//				System.out.println("Fini la distrib");
 				readyToTick = false;
 			}			
 
@@ -132,7 +134,7 @@ public class SimulationAgent extends Agent {
 			{
 				block();
 			}
-			System.out.println("Agent Registration");
+//			System.out.println("Agent Registration");
 			ACLMessage message =null;
 			String content;
 			MessageTemplate mTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM).MatchConversationId("register");
@@ -149,7 +151,7 @@ public class SimulationAgent extends Agent {
 				ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
 				message1.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
 				message1.setConversationId("Start");
-				System.out.println("Creation Grille");
+//				System.out.println("Creation Grille");
 				send(message1);
 			
 			
@@ -158,7 +160,7 @@ public class SimulationAgent extends Agent {
 			ACLMessage responseFromEnvAgent = receive(mTemplate2);
 			if(responseFromEnvAgent != null)
 			{
-				System.out.println("Création de la grille Done: Début de la simulation");
+//				System.out.println("Création de la grille Done: Début de la simulation");
 				GridIsSet = true;
 				readyToTick = true;
 				block();			
