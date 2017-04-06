@@ -3,15 +3,19 @@
  */
 package agent;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.acl.Acl;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.org.apache.bcel.internal.classfile.InnerClass;
 import com.sun.org.apache.bcel.internal.generic.I2F;
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
@@ -24,10 +28,11 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.util.leap.ArrayList;
 import jade.util.leap.List;
+import java.util.ArrayList;
 import main.Cell;
 import main.listof9cell;
+import sun.security.util.UntrustedCertificates;
 
 /**
  * @author ia04p007
@@ -77,12 +82,8 @@ public class updateSudokuBehaviour extends Behaviour{
 					for (int j = 0; j < cells.length; j++) {
 						Cell cellule = SudokuCellTable[cells[j].getLine()][cells[j].getCol()];
 						if (SudokuCellTable[cells[j].getLine()][cells[j].getCol()].getValue() == 0)
-						{
+						{		
 						SudokuCellTable[cells[j].getLine()][cells[j].getCol()] = choseValuesPossibleForCell(SudokuCellTable[cells[j].getLine()][cells[j].getCol()],cells[j]);
-						if(SudokuCellTable[cells[j].getLine()][cells[j].getCol()].getValue() != 0 ){
-							System.out.println("Valeur changée : cell("+cells[j].getLine()+","+cells[j].getCol()+")");
-							drawSudokuGrill(cells,j);
-						}
 						}
 						}
 					agentSentTo.remove(i);
@@ -95,8 +96,20 @@ public class updateSudokuBehaviour extends Behaviour{
 
 			} 
 		}
+	
 		if(agentSentTo.size() == 0 && SimulationAgent.GridIsSet == true)
 		{
+			System.out.println(drawSudokuGrill());
+			solved_cells = 0;
+
+			for (int i = 0; i < SudokuCellTable.length; i++) {
+				for (int j = 0; j < SudokuCellTable.length; j++) {
+					if(SudokuCellTable[i][j].getValue() !=0)
+					{
+						solved_cells = solved_cells + 1;
+					}
+				}
+			}
 		
 			if(solved_cells < 9*9)
 			{
@@ -120,14 +133,14 @@ public class updateSudokuBehaviour extends Behaviour{
 		}
 		
 	private String drawSudokuGrill(){
-		String string="";
+		String string="\t-----------------------------\n";
 		for (int j1 = 0; j1 < 9; j1++) {
 			string += "\t |";
 			for (int k = 0; k < 9; k++) {
 			
-				string = string+" . "+SudokuCellTable[j1][k].getValue();
+				string = string+" | "+SudokuCellTable[j1][k].getValue();
 			}
-			string+=" | \n";
+			string+=" | \n -----------------------------------\n";
 			
 		}
 		//System.out.println(string);
@@ -155,27 +168,24 @@ public class updateSudokuBehaviour extends Behaviour{
 	 * @return
 	 */
 	private Cell choseValuesPossibleForCell(Cell cell, Cell cell2) {
-			if (cell.getValue() == cell2.getValue()) {
-				if (cell.getPossibleValues()[0] == null) {
-					Integer[] table = new Integer[9];
-					for (int i = 0; i < table.length; i++) {
-						table[i] = i + 1;
-					}
-					cell.setPossibleValues(table);
-				}
-				Set<Integer> s1 = new HashSet<Integer>(Arrays.asList(cell.getPossibleValues()));
-				Set<Integer> s2 = new HashSet<Integer>(Arrays.asList(cell2.getPossibleValues()));
-				s1.retainAll(s2);
-				//System.out.println("Résultat comparaison" + s1);
-				Integer[] resultat = s1.toArray(new Integer[s1.size()]);
-				cell.setPossibleValues(resultat);
-				
-				if (s1.size() == 1 && resultat[0] != null && cell.getValue() == 0) {
-
-					cell.setValue(resultat[0]);
-					solved_cells = solved_cells +1 ;
-					cell.setPossibleValues(new Integer[9]);
-				} 
+			if (cell2.getValue() == 0 && cell.getValue() == cell2.getValue()) {
+//				Set<Integer> s1 = new HashSet<Integer>(Arrays.asList(cell.getPossibleValues()));
+//				Set<Integer> s2 = new HashSet<Integer>(Arrays.asList(cell2.getPossibleValues()));
+//				s1.retainAll(s2);
+//				//System.out.println("Résultat comparaison" + s1);
+//				Integer[] resultat = s1.toArray(new Integer[s1.size()]);
+//				
+//				if (s1.size() == 1 && resultat[0] != null && cell.getValue() == 0) {
+//
+//					cell.setValue(resultat[0]);
+//					cell.setPossibleValues(null);
+//				} 
+//				else {
+//					cell.setPossibleValues(resultat);
+//				}
+			}
+			else {
+				cell.setValue(cell2.getValue());
 			}
 			return cell;
 			
@@ -272,7 +282,7 @@ public class stimulateAnAgentBehaviour extends Behaviour {
 		
 		if (SimulationAgent.readyToTick == true)
 		{
-			InitalizeSudokuGrid();
+//			InitalizeSudokuGrid();
 
 			while (nbmsg<27 ) {
 
@@ -341,7 +351,6 @@ public class stimulateAnAgentBehaviour extends Behaviour {
 	}
 
 }
-
 	
 public class createSudokuTableBehaviour extends Behaviour {
 		public createSudokuTableBehaviour(EnvAgent envAgent, String op) {
@@ -359,38 +368,79 @@ public class createSudokuTableBehaviour extends Behaviour {
 			{
 				System.out.println("je recrée la table de sudoku");
 
-				int[][] tableSudoku={{5,0,0,0,0,4,0,0,8},{0,1,0,9,0,7,0,0,0},{0,9,2,8,5,0,7,0,6},{7,0,0,3,0,1,0,0,4},{0,0,0,0,0,0,0,0,0},{6,0,0,2,0,8,0,0,1},{1,0,8,0,3,2,4,9,0},{0,0,0,1,0,6,0,5,0},{3,0,0,7,0,0,0,0,2}};
-				SudokuCellTable = new Cell[9][9];
+				//int[][] tableSudoku={{5,0,0,0,0,4,0,0,8},{0,1,0,9,0,7,0,0,0},{0,9,2,8,5,0,7,0,6},{7,0,0,3,0,1,0,0,4},{0,0,0,0,0,0,0,0,0},{6,0,0,2,0,8,0,0,1},{1,0,8,0,3,2,4,9,0},{0,0,0,1,0,6,0,5,0},{3,0,0,7,0,0,0,0,2}};
+				Scanner s;
+				Integer[][] tableSudoku = new Integer[9][9];
+
+				try {
+					s = new Scanner(new File(System.getProperty("user.dir")+"/TDSudoku/src/sample/grid1.txt"));
+					int i = 0;
+					int j =0;
+
+				    ArrayList<Integer[]> outer = new ArrayList<Integer[]>();
+				    ArrayList<Integer> inner = new ArrayList<Integer>();   
+				    
+					while (s.hasNext()){
+						inner.add(s.nextInt());
+						i = i+1;
+						if(i==9)
+						{
+							j = j+1;
+							outer.add(inner.toArray(new Integer[inner.size()]));
+							inner = new ArrayList<Integer>(); 
+							i = 0;
+						}
+						if(j == 9)
+						break;
+					}
+					tableSudoku= outer.toArray(new Integer[outer.size()][9]);
+					s.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
+				
+				
+				SudokuCellTable = new Cell[9][9];
 				//On parcourt la table de sudoku, le i correspond à la ligne 
-				for (int i=0; i<=8; i++)
+				for (int i1=0; i1<=8; i1++)
 				{
 					//Parcours par colonne 
-					for (int j = 0; j<=8; j ++)
+					for (int j1 = 0; j1<=8; j1 ++)
 					{
 						int k = 1;
 						Cell cell_to_insert = new Cell();
-						cell_to_insert.setLine(i);
-						cell_to_insert.setCol(j);
-						cell_to_insert.setValue(tableSudoku[i][j]);
+						cell_to_insert.setLine(i1);
+						cell_to_insert.setCol(j1);
+						cell_to_insert.setValue(tableSudoku[i1][j1]);
 						if(cell_to_insert.getValue() !=0)
-						solved_cells = solved_cells + 1;
-					
-						k=(j/3 <= 1)?1:2;
-						if(j/3 > 2) k=3;
+							cell_to_insert.setPossibleValues(null);
+						else
+						{
+							Set<Integer> s1 = new HashSet<Integer>();
+
+							for (int j11 = 1; j11 <= 9; j11++) {
+									s1.add(j11);
+							}
+							cell_to_insert.setPossibleValues(s1.toArray( new Integer[s1.size()]));
+						}
+						
+						k=(j1/3 <= 1)?1:2;
+						if(j1/3 > 2) k=3;
 												
-						if(i/3 <= 1)
+						if(i1/3 <= 1)
 						{
 							cell_to_insert.setBlock(k);
 						}
-						else if (i/3 <= 2) {
+						else if (i1/3 <= 2) {
 							cell_to_insert.setBlock(k+3);
 						}
 						else {
 							cell_to_insert.setBlock(k+6);
 						}
 						
-					SudokuCellTable[i][j] = cell_to_insert;
+					SudokuCellTable[i1][j1] = cell_to_insert;
 					}
 					
 				}
