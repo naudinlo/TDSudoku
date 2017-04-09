@@ -40,6 +40,7 @@ protected void setup() {
 }
 public class calculateBehaviour extends Behaviour{
 	Cell cell[];
+	int cells_changed = 0;
 
 	public calculateBehaviour(AnAgent anAgent, String op) {
 		// TODO Auto-generated constructor stub
@@ -57,13 +58,15 @@ public class calculateBehaviour extends Behaviour{
 				String content =message_from_env.getContent();
 //				System.out.println(content);
 				Cell[] cellules  = mapper.readValue(content, Cell[].class);
-				//cellules = findCommonValuesForCells(cellules);
+				
+				cellules = algo4(cellules);
 				cellules = algo2(cellules);
+				cells_changed = 0;
 				cellules = algo1(cellules);
+				cellules = algo2(cellules);
+
 				cellules = algo3bis(cellules);
-				//cellules = algo4(cellules);
-				//System.out.println(mapper.writeValueAsString(cellules));
-				//cellules = algo3(cellules);
+				cellules = algo2(cellules);
 
 			
 				String content_to_send =mapper.writeValueAsString(cellules); 
@@ -93,6 +96,7 @@ public class calculateBehaviour extends Behaviour{
 			Cell cell = cellules[i];
 			if(cell.getPossibleValues().length == 1 && cell.getPossibleValues() != null)
 			{
+				cells_changed = cells_changed +1;
 				cell.setValue(cell.getPossibleValues()[0]);
 				cell.setPossibleValues(null);
 				cellules[i]=cell;
@@ -123,15 +127,13 @@ public class calculateBehaviour extends Behaviour{
 		
 	}
 	private Cell[] algo4(Cell[] cellules){
+		//Liste des elements de la cellule
 		Set<Cell> liste = new HashSet<Cell>(Arrays.asList(cellules));
 		Set<Cell> liste2 = new HashSet<Cell>(Arrays.asList(cellules));
-
 		liste.removeIf(cle->cle.getValue() != 0 );
 		Set<Cell> liste_a_2_elements= liste;
-
 		liste2.removeIf(cle->cle.getValue() == 0 );
 		liste_a_2_elements.removeIf(cle->cle.getPossibleValues().length != 2);
-		
 		Cell[] tester=liste2.toArray(new Cell[liste2.size()]);
 		Cell[] cellule_a_2_poss=liste_a_2_elements.toArray(new Cell[liste_a_2_elements.size()]);
 

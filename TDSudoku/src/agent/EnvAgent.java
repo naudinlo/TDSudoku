@@ -133,14 +133,14 @@ public class updateSudokuBehaviour extends Behaviour{
 		}
 		
 	private String drawSudokuGrill(){
-		String string="\t-----------------------------\n";
+		String string="\t .  .   .   .   .   .   .   .   .\n";
 		for (int j1 = 0; j1 < 9; j1++) {
-			string += "\t |";
+			string += "\t  ";
 			for (int k = 0; k < 9; k++) {
 			
-				string = string+" | "+SudokuCellTable[j1][k].getValue();
+				string = string+SudokuCellTable[j1][k].getValue()+" . ";
 			}
-			string+=" | \n -----------------------------------\n";
+			string+=" \n \t .   .   .   .   .   .   .   .   .\n";
 			
 		}
 		//System.out.println(string);
@@ -169,20 +169,20 @@ public class updateSudokuBehaviour extends Behaviour{
 	 */
 	private Cell choseValuesPossibleForCell(Cell cell, Cell cell2) {
 			if (cell2.getValue() == 0 && cell.getValue() == cell2.getValue()) {
-//				Set<Integer> s1 = new HashSet<Integer>(Arrays.asList(cell.getPossibleValues()));
-//				Set<Integer> s2 = new HashSet<Integer>(Arrays.asList(cell2.getPossibleValues()));
-//				s1.retainAll(s2);
-//				//System.out.println("Résultat comparaison" + s1);
-//				Integer[] resultat = s1.toArray(new Integer[s1.size()]);
-//				
-//				if (s1.size() == 1 && resultat[0] != null && cell.getValue() == 0) {
-//
-//					cell.setValue(resultat[0]);
-//					cell.setPossibleValues(null);
-//				} 
-//				else {
-//					cell.setPossibleValues(resultat);
-//				}
+				Set<Integer> s1 = new HashSet<Integer>(Arrays.asList(cell.getPossibleValues()));
+				Set<Integer> s2 = new HashSet<Integer>(Arrays.asList(cell2.getPossibleValues()));
+				s1.retainAll(s2);
+				//System.out.println("Résultat comparaison" + s1);
+				Integer[] resultat = s1.toArray(new Integer[s1.size()]);
+				
+				if (s1.size() == 1 && resultat[0] != null && cell.getValue() == 0) {
+
+					cell.setValue(resultat[0]);
+					cell.setPossibleValues(null);
+				} 
+				else {
+					cell.setPossibleValues(resultat);
+				}
 			}
 			else {
 				cell.setValue(cell2.getValue());
