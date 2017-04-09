@@ -58,8 +58,9 @@ public class calculateBehaviour extends Behaviour{
 				String content =message_from_env.getContent();
 //				System.out.println(content);
 				Cell[] cellules  = mapper.readValue(content, Cell[].class);
-				
+				cellules = algo2(cellules);
 				cellules = algo4(cellules);
+
 				cellules = algo2(cellules);
 				cells_changed = 0;
 				cellules = algo1(cellules);
@@ -127,42 +128,38 @@ public class calculateBehaviour extends Behaviour{
 		
 	}
 	private Cell[] algo4(Cell[] cellules){
-		//Liste des elements de la cellule
-		Set<Cell> liste = new HashSet<Cell>(Arrays.asList(cellules));
-		Set<Cell> liste2 = new HashSet<Cell>(Arrays.asList(cellules));
-		liste.removeIf(cle->cle.getValue() != 0 );
-		Set<Cell> liste_a_2_elements= liste;
-		liste2.removeIf(cle->cle.getValue() == 0 );
-		liste_a_2_elements.removeIf(cle->cle.getPossibleValues().length != 2);
-		Cell[] tester=liste2.toArray(new Cell[liste2.size()]);
-		Cell[] cellule_a_2_poss=liste_a_2_elements.toArray(new Cell[liste_a_2_elements.size()]);
+		
+		Set<Cell> cells = new HashSet<Cell>(Arrays.asList(cellules));
+		cells.removeIf(cle->cle.getValue() != 0);
+		cells.removeIf(cle->cle.getPossibleValues().length > 2);
+		Cell[] cel = cells.toArray(new Cell[cells.size()]);
 
-		for (int i = 0; i < cellule_a_2_poss.length; i++) {
-			Set<Integer> valeurs = new HashSet<Integer>(Arrays.asList(cellule_a_2_poss[i].getPossibleValues()));
-			int presente = 0;
-			for (int j = 0; j < tester.length; j++) {
-				Set<Integer> valeurs_a_test = new HashSet<Integer>(Arrays.asList(tester[j].getPossibleValues()));
-				if(valeurs_a_test.containsAll(valeurs))
-				{
-					presente = presente + 1 ;
+		if(cells.size() > 0)
+		{
+			cells.forEach(cle->{
+				Set<Integer> values_to_test = new HashSet<Integer>(Arrays.asList(cle.getPossibleValues()));
+				int isIn = 0;
+				for (int i = 0; i < cel.length; i++) {
+					Set<Integer> values_to_test_with = new HashSet<Integer>(Arrays.asList(cel[i].getPossibleValues()));
+					if(values_to_test_with.containsAll(values_to_test)) ++isIn;
 				}
-			}
-			if(presente == 2)
-			{
-				for (int j = 0; j < tester.length; j++) {
-					Set<Integer> valeurs_a_test = new HashSet<Integer>(Arrays.asList(tester[j].getPossibleValues()));
-					if(valeurs_a_test.containsAll(valeurs) == false)
-					{
-						valeurs_a_test.removeIf(cle->valeurs.contains(cle));
-						tester[j].setPossibleValues(valeurs_a_test.toArray(new Integer[valeurs_a_test.size()]));
+				if(isIn == 2)
+				{
+					for (int i = 0; i < cellules.length; i++) {
+						if(cellules[i].getValue() != 0) continue;
+						if(cellules[i].getPossibleValues().length <=2) continue;
+						Set<Integer> values_to_test_with = new HashSet<Integer>(Arrays.asList(cellules[i].getPossibleValues()));
+						System.out.println("On tente de retirer "+values_to_test+" de "+values_to_test_with);
+						values_to_test_with.removeIf(cle2->values_to_test.contains(cle2));
+						System.out.println("Res "+ values_to_test_with);
+						cellules[i].setPossibleValues(values_to_test_with.toArray(new Integer[values_to_test_with.size()]));
 					}
 				}
-				break;
-			}
+				System.out.println(isIn);
+			});
 		}
-		liste.addAll(liste2);
-		cellules = liste.toArray(new Cell[liste.size()]);
 		return cellules;
+		
 		
 	}
 	private Cell[] algo3bis(Cell[] cellules){
@@ -183,7 +180,7 @@ public class calculateBehaviour extends Behaviour{
 					}				}
 				if (isIn == false)
 				{
-					System.out.println("Cellule ("+cell.getLine()+","+cell.getCol()+")");
+					//System.out.println("Cellule ("+cell.getLine()+","+cell.getCol()+")");
 					cellules[i].setValue(val);
 					cellules[i].setPossibleValues(null);
 				}
