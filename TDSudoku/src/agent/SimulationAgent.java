@@ -7,6 +7,8 @@ import java.security.acl.Acl;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sun.xml.internal.ws.org.objectweb.asm.Label;
+
 import FIPA.stringsHelper;
 import jade.core.AID;
 import jade.core.Agent;
@@ -43,7 +45,12 @@ public class SimulationAgent extends Agent {
 
 
 	}
-	public class finishBehaviour extends Behaviour{
+	
+/**
+ *Behaviour used when the sudoku is done
+ *
+ */
+public class finishBehaviour extends Behaviour{
 
 		/**
 		 * @param simulationAgent
@@ -58,7 +65,7 @@ public class SimulationAgent extends Agent {
 		 */
 		@Override
 		public void action() {
-			// TODO Auto-generated method stub
+			// Recoit le message de ConversationID End de performative CONFIRM qui contient la grille
 			ACLMessage message =null;
 			message=receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM).MatchConversationId("End"));
 
@@ -81,6 +88,11 @@ public class SimulationAgent extends Agent {
 		}
 		
 	}
+
+	/**
+	 * Behaviour used to send the 27 messages to the Environement agent
+	 *
+	 */
 	public class tickerBehaviour extends TickerBehaviour{
 		/**
 		 * @param a
@@ -97,23 +109,29 @@ public class SimulationAgent extends Agent {
 		@Override
 		protected void onTick() {
 			
-			// TODO Auto-generated method stub
+			// Si la grille est initialisée et que l'agent de simulation est autorisé à envoyer les 27 messages
 			if(GridIsSet == true && readyToTick == true){
 				System.out.println("C'est parti \n");
 				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 				message.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
 				message.setConversationId("Ticker");
+				//Pour chaque nom d'agent contenu dans la Map des agents
 				AgentMap.forEach((key,value)->{
 					message.setContent(value);
 					send(message);
 				});
-//				System.out.println("Fini la distrib");
+				//Une fois le message envoyé, on bloque temporairement le tic
 				readyToTick = false;
 			}			
 
 		}
 		
 	}
+	
+	/**
+	 *Behaviour used for the registration of the Analyze agents into the map and the creation of the sudoku Grid
+	 *
+	 */
 	public class registerBehaviour extends Behaviour{
 
 		/**
@@ -129,38 +147,39 @@ public class SimulationAgent extends Agent {
 		 */
 		@Override
 		public void action() {
-			// TODO Auto-generated method stub
+			//Si la grille sudoku est déjà en place, ce behaviour doit être bloqué 
 			if(GridIsSet == true)
 			{
 				block();
 			}
-//			System.out.println("Agent Registration");
 			ACLMessage message =null;
 			String content;
 			MessageTemplate mTemplate = MessageTemplate.MatchPerformative(ACLMessage.INFORM).MatchConversationId("register");
-			message=receive(mTemplate);				
+			message=receive(mTemplate);	
+			//Si il reçoit un message de la part d'un agent d'analyse de conversationId register 
+			//Cela signifie qu'il va l'ajouter à sa Map d'agents
 			if(message != null){			
 				content = message.getContent();
 				AgentMap.put(AgentMap.size() + 1, content);	
 			}
-		
+			//Si il a rempli sa Map des 27 messages, l'enregistrement est terminé
+			//Alors on débute l'initialisation de la grille de sudoku
 			if(AgentMap.size() == 27 && GridIsSet == false)
 			{
 				System.out.println("Agent Registration Done");
-
+				//On envoir un message d'ID Start à l'agent d'environnement pour qu'il crée la grille
 				ACLMessage message1 = new ACLMessage(ACLMessage.REQUEST);
 				message1.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
 				message1.setConversationId("Start");
-//				System.out.println("Creation Grille");
 				send(message1);
 			
 			
-			
+			//Une fois le message reçu de la part de l'agent d'environnement
 			MessageTemplate mTemplate2=MessageTemplate.MatchPerformative(ACLMessage.CONFIRM).MatchConversationId("Start");
 			ACLMessage responseFromEnvAgent = receive(mTemplate2);
 			if(responseFromEnvAgent != null)
 			{
-//				System.out.println("Création de la grille Done: Début de la simulation");
+				//La grille est mise en place , le travail de simulation peut commencer
 				GridIsSet = true;
 				readyToTick = true;
 				block();			

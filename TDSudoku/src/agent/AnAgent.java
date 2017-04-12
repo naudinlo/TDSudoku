@@ -28,6 +28,7 @@ protected void setup() {
 	// TODO Auto-generated method stub
 	super.setup();
 	String op = getLocalName();
+	//L'agent d'analyse va envoyer un message à l'agent de simulation durant son initialisation
 	ACLMessage register_message =new ACLMessage(ACLMessage.INFORM);
 	register_message.setConversationId("register");
 	register_message.addReceiver(new AID("SimulationAgent", AID.ISLOCALNAME));
@@ -40,7 +41,6 @@ protected void setup() {
 }
 public class calculateBehaviour extends Behaviour{
 	Cell cell[];
-	int cells_changed = 0;
 
 	public calculateBehaviour(AnAgent anAgent, String op) {
 		// TODO Auto-generated constructor stub
@@ -56,17 +56,16 @@ public class calculateBehaviour extends Behaviour{
 
 			try {
 				String content =message_from_env.getContent();
-//				System.out.println(content);
 				Cell[] cellules  = mapper.readValue(content, Cell[].class);
+				//On reinitialise les cellules avant chaque traitement (algo2)
 				cellules = algo2(cellules);
 				cellules = algo4(cellules);
 
 				cellules = algo2(cellules);
-				cells_changed = 0;
 				cellules = algo1(cellules);
+				
 				cellules = algo2(cellules);
-
-				cellules = algo3bis(cellules);
+				cellules = algo3(cellules);
 				cellules = algo2(cellules);
 
 			
@@ -97,7 +96,6 @@ public class calculateBehaviour extends Behaviour{
 			Cell cell = cellules[i];
 			if(cell.getPossibleValues().length == 1 && cell.getPossibleValues() != null)
 			{
-				cells_changed = cells_changed +1;
 				cell.setValue(cell.getPossibleValues()[0]);
 				cell.setPossibleValues(null);
 				cellules[i]=cell;
@@ -149,20 +147,17 @@ public class calculateBehaviour extends Behaviour{
 						if(cellules[i].getValue() != 0) continue;
 						if(cellules[i].getPossibleValues().length <=2) continue;
 						Set<Integer> values_to_test_with = new HashSet<Integer>(Arrays.asList(cellules[i].getPossibleValues()));
-						System.out.println("On tente de retirer "+values_to_test+" de "+values_to_test_with);
 						values_to_test_with.removeIf(cle2->values_to_test.contains(cle2));
-						System.out.println("Res "+ values_to_test_with);
 						cellules[i].setPossibleValues(values_to_test_with.toArray(new Integer[values_to_test_with.size()]));
 					}
 				}
-				System.out.println(isIn);
 			});
 		}
 		return cellules;
 		
 		
 	}
-	private Cell[] algo3bis(Cell[] cellules){
+	private Cell[] algo3(Cell[] cellules){
 		for (int i = 0; i < cellules.length; i++) {
 			if(cellules[i].getValue() != 0) continue;
 			Cell cell = cellules[i];
