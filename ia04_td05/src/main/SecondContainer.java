@@ -18,7 +18,7 @@ public static void main(String[] args){
 	try {
 		p = new ProfileImpl(SECONDARY_PROPERTIES_FILE);
 		td05Container = rt.createAgentContainer(p);
-		AgentController ac = td05Container.createNewAgent("KB", "agent.kb",null);
+		AgentController ac = td05Container.createNewAgent("KB", "agent.KB",null);
 		ac.start();
 
 	

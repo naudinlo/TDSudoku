@@ -18,7 +18,7 @@ public class MainContainer  {
 
 		}
 		catch(Exception ex){
-		
+		System.out.println(ex.toString());
 		}
 	
 }
