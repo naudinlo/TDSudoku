@@ -1,0 +1,39 @@
+@prefix td5: 	 <http://example.org/> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wot:     <http://xmlns.com/wot/0.1/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix vs:      <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+
+td5:litterature rdf:type owl:Thing.
+td5:litterature foaf:name "Litterature"^^xsd:string.
+
+td5:axel  rdf:type foaf:Person .
+td5:axel foaf:givenname "Axel"^^xsd:string .
+td5:axel foaf:knows td5:marianne.
+td5:axel foaf:topic_interest td5:litterature.
+
+
+td5:sophie  rdf:type foaf:Person .
+td5:sophie foaf:givenname "Sophie"^^xsd:string .
+td5:sophie foaf:knows td5:jean.
+
+
+td5:lucas rdf:type foaf:Person .
+td5:lucas foaf:givenname "Lucas"^^xsd:string .
+td5:lucas foaf:knows td5:axel.
+td5:lucas foaf:topic_interest td5:litterature.
+
+td5:marianne rdf:type foaf:Person .
+td5:marianne foaf:givenname "Marianne"^^xsd:string .
+td5:marianne foaf:knows td5:jean.
+td5:marianne foaf:topic_interest td5:litterature.
+
+
+td5:jean  rdf:type foaf:Person .
+td5:jean foaf:givenname "Jean"^^xsd:string .
+td5:jean foaf:knows td5:sophie.
+td5:jean foaf:knows td5:axel.
