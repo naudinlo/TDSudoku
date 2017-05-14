@@ -1,0 +1,32 @@
+PREFIX dc:      <http://purl.org/dc/elements/1.1/> 
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX wot:     <http://xmlns.com/wot/0.1/> 
+PREFIX owl:     <http://www.w3.org/2002/07/owl#> 
+PREFIX vs:      <http://www.w3.org/2003/06/sw-vocab-status/ns#> 
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ex: <http://www.owl-ontologies.com/ex#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX lgd: <http://linkedgeodata.org/>
+PREFIX lgdo: <http://linkedgeodata.org/ontology/>
+PREFIX xsd:        <http://www.w3.org/2001/XMLSchema#>
+PREFIX geo: <http://linkedgeodata.org/triplify/> 
+
+
+#SELECT DISTINCT ?x 
+#WHERE{ {?x rdfs:subClassOf ?y} UNION {?x a rdfs:Class} UNION{?e rdfs:subClassOf ?x}}
+
+#SELECT DISTINCT ?x 
+#WHERE{ {?x rdfs:domain ?y} UNION {?x a rdf:Property} }
+
+
+#SELECT DISTINCT ?y WHERE{ 	?x rdfs:domain ?y.	?z rdfs:domain ?y.	FILTER(?x != ?z) }
+
+#SELECT * FROM <http://linkedgeodata.org>
+#WHERE {
+ #?country a lgdo:Country ;
+ #lgdo:capital_city ?city ;
+ #lgdo:wikipedia ?name .
+#} 
+ SELECT ?y WHERE{ ?x foaf:givenname ?name ; 
+ foaf:topic_interest ?y. }
