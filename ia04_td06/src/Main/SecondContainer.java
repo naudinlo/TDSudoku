@@ -18,15 +18,15 @@ public static void main(String[] args){
 	try {
 		p = new ProfileImpl(SECONDARY_PROPERTIES_FILE);
 		td05Container = rt.createAgentContainer(p);
-		AgentController ac = td05Container.createNewAgent("KB", "Agent.KB",null);
-		ac.start();
 		AgentController ac2 = td05Container.createNewAgent("PropagateSparqlAgent", "Agent.PropagateSparqlAgent",null);
 		ac2.start();
+		AgentController ac = td05Container.createNewAgent("KB", "Agent.KB",null);
+		ac.start();
 
-		AgentController ac3 = td05Container.createNewAgent("propagateGeoSparql", "Agent.propagateGeoSparql",null);
-		ac3.start();
 		AgentController ac4 = td05Container.createNewAgent("GeodataAgent", "Agent.GeodataAgent",null);
 		ac4.start();
+		AgentController ac3 = td05Container.createNewAgent("propagateGeoSparql", "Agent.propagateGeoSparql",null);
+		ac3.start();
 	
 	} catch (Exception ex) {
 	ex.printStackTrace();

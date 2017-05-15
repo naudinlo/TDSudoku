@@ -28,21 +28,29 @@ import org.apache.jena.util.FileManager;
 import arq.rset;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import model.RegisterToService;
 
-public class KB extends Agent{
+public class KB extends Agent implements RegisterToService{
 	@Override
 	protected void setup() {
 		// TODO Auto-generated method stub
 		super.setup();
+		//TD05
 		addBehaviour(new retrieveAssertionFromIdBehaviour());
 		addBehaviour(new retrieveAssertionFromNameBehaviour());
 		addBehaviour(new retrievePersonFromIdBehaviour());
+		//TD06
 		addBehaviour(new retrieveBySparqlPersonFromRequestBehaviour());
-
-
+		RegisterToService.registerToDf(this, "SPARQLRequest", "BC");
+		
 	}
+	
 	public class retrieveAssertionFromIdBehaviour extends Behaviour{
 
 		@Override
@@ -246,6 +254,7 @@ public class KB extends Agent{
 		}
 		return resource;
 	}
+	
 	public class retrieveBySparqlPersonFromRequestBehaviour extends Behaviour{
 
 		/* (non-Javadoc)

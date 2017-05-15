@@ -25,8 +25,9 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import model.RegisterToService;
 
-public class GeodataAgent extends Agent{
+public class GeodataAgent extends Agent implements RegisterToService{
 
 
 @Override
@@ -35,19 +36,22 @@ protected void setup() {
 	super.setup();
 	addBehaviour(new RetrieveGeodataBehaviour());
 	addBehaviour(new retrieveCountriesOfPersonInterestedBehaviour());
+	RegisterToService.registerToDf(this, "SPARQLRequest", "GeoDB");
+
 }
 public class RetrieveGeodataBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub
-		MessageTemplate messageTemplate = MessageTemplate.MatchConversationId("Capital").MatchPerformative(ACLMessage.QUERY_REF);
+		MessageTemplate messageTemplate = MessageTemplate.MatchConversationId("Capital");
 		ACLMessage message; 
 		if((message = receive(messageTemplate)) == null)
 		{
 			block();
 			return;
 		}
+		System.out.println("agent Distant");
 		String q = message.getContent();
 		Query query = QueryFactory.create(q);
 		System.setProperty("http.proxyHost","proxyweb.utc.fr");
@@ -73,7 +77,7 @@ public class retrieveCountriesOfPersonInterestedBehaviour extends Behaviour {
 	@Override
 	public void action() {
 		// TODO Auto-generated method stub	
-		MessageTemplate template = MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF).MatchConversationId("Country");
+		MessageTemplate template = MessageTemplate.MatchConversationId("Country");
 		ACLMessage message;
 		if((message = receive(template))== null)
 		{
@@ -81,6 +85,7 @@ public class retrieveCountriesOfPersonInterestedBehaviour extends Behaviour {
 			return;
 		}
 
+		System.out.println("Agent Local");
 
 		String q =message.getContent();
 

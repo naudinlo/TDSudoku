@@ -3,6 +3,8 @@
  */
 package Agent;
 
+import java.util.Date;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -15,16 +17,21 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.SequentialBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.core.event.MessageAdapter;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import model.RegisterToService;
 
 /**
  * @author ia04p007
  *
  */
-public class PropagateSparqlAgent extends Agent{
+public class PropagateSparqlAgent extends Agent implements RegisterToService{
 
+
+private AID agent_to_communicate = null;
 
 /* (non-Javadoc)
  * @see jade.core.Agent#setup()
@@ -36,7 +43,10 @@ protected void setup() {
 	addBehaviour(new GetPersonKnowingBehaviour());
 	addBehaviour(new ReceiveResponseBehaviour());
 	addBehaviour(new GetPersonInterestedBySameCountryThenPersonBehaviour());
+
 }
+
+
 public class GetPersonKnowingBehaviour extends Behaviour{
 
 	/* (non-Javadoc)
@@ -62,7 +72,11 @@ public class GetPersonKnowingBehaviour extends Behaviour{
 			System.out.println(q);
 			ACLMessage response = new ACLMessage(ACLMessage.QUERY_REF);
 			response.setConversationId("know");
-			response.addReceiver(new AID("KB",AID.ISLOCALNAME));
+			if(agent_to_communicate == null)
+			{
+				agent_to_communicate = RegisterToService.searchRegisteredAgent(myAgent, "SPARQLRequest", "KB");
+			}
+			response.addReceiver(agent_to_communicate);
 			response.setContent(q);
 			send(response);
 		
@@ -130,7 +144,11 @@ public class GetPersonInterestedBySameCountryThenPersonBehaviour extends Behavio
 		System.out.println(sql);
 		ACLMessage response = new ACLMessage(ACLMessage.QUERY_REF);
 		response.setConversationId("Country");
-		response.addReceiver(new AID("KB",AID.ISLOCALNAME));
+		if(agent_to_communicate == null)
+		{
+			agent_to_communicate = RegisterToService.searchRegisteredAgent(myAgent, "SPARQLRequest", "KB");
+		}
+		response.addReceiver(agent_to_communicate);
 		response.setContent(sql);
 		send(response);
 	}

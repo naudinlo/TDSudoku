@@ -4,34 +4,46 @@ import java.io.IOException;
 import java.security.acl.Acl;
 import java.util.List;
 
+import org.apache.commons.io.output.ThresholdingOutputStream;
 import org.apache.jena.query.QuerySolution;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import Agent.propagateGeoSparql.getCapitalOfCountryInterestedBehaviour;
+import Agent.propagateGeoSparql.testConnexionWithGeoDBBehaviour;
 import Agent.propagateGeoSparql.getCountryInterestedBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.FSMBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import model.RegisterToService;
 
 public class propagateGeoSparql extends Agent {
 
 
+private AID agent_to_communicate;
 @Override
 protected void setup() {
 	// TODO Auto-generated method stub
 	super.setup();
-//	addBehaviour(new getCapitalOfCountryInterestedBehaviour());
+//	addBehaviour(new testConnexionWithGeoDBBehaviour());
+
 	addBehaviour(new getCountryInterestedBehaviour());
 	addBehaviour(new getCapitalOfCountryBehaviour());
 }
-public class getCapitalOfCountryInterestedBehaviour extends Behaviour {
+
+/**
+ * Behaviour pour tester la connexion avec Base distante
+ *
+ */
+public class testConnexionWithGeoDBBehaviour extends Behaviour {
 
 	@Override
 	public void action() {
-		// TODO Auto-generated method stub
 		MessageTemplate messageTemplate = MessageTemplate.MatchConversationId("Capital").MatchPerformative(ACLMessage.REQUEST);
 		ACLMessage message; 
 		if((message =receive(messageTemplate)) == null)
@@ -49,9 +61,13 @@ public class getCapitalOfCountryInterestedBehaviour extends Behaviour {
 				+ " lgdo:wikipedia ?name .} ";
 		ACLMessage message2 = new ACLMessage(ACLMessage.QUERY_REF);
 		message2.setConversationId("Country");
-		message2.addReceiver(new AID("GeodataAgent", AID.ISLOCALNAME));
+		if(agent_to_communicate == null)
+		{
+			agent_to_communicate = RegisterToService.searchRegisteredAgent(myAgent, "SPARQLRequest", "GeoDB");
+		}
+		message2.addReceiver(agent_to_communicate);
 		message2.setContent(sparql);
-		message2.addReplyTo(new AID("PropagateSparqlAgent", AID.ISLOCALNAME));
+//		message2.addReplyTo(new AID("PropagateSparqlAgent", AID.ISLOCALNAME));
 		send(message2);
 		
 
@@ -64,6 +80,7 @@ public class getCapitalOfCountryInterestedBehaviour extends Behaviour {
 	}
 
 }
+
 public class getCountryInterestedBehaviour extends Behaviour {
 
 	@Override
@@ -87,10 +104,14 @@ public class getCountryInterestedBehaviour extends Behaviour {
 				+ "foaf:topic_interest ?y."
 				+ " FILTER(?name=\""+person_name+"\"^^xsd:string)}";
 		ACLMessage message2 = new ACLMessage(ACLMessage.QUERY_REF);
+	
 		message2.setConversationId("Country");
-		message2.addReceiver(new AID("GeodataAgent", AID.ISLOCALNAME));
+if(agent_to_communicate == null)
+{
+	agent_to_communicate = RegisterToService.searchRegisteredAgent(myAgent, "SPARQLRequest", "GeoDB");
+}
+		message2.addReceiver(agent_to_communicate);
 		message2.setContent(sparql);
-		//message2.addReplyTo(new AID("PropagateSparqlAgent", AID.ISLOCALNAME));
 		send(message2);
 		
 
@@ -128,16 +149,18 @@ public class getCapitalOfCountryBehaviour extends Behaviour{
 			if(i!=0)sparql+=" || ";
 			String string = geo[i];
 			geo[i]= string.substring(string.indexOf("<"), string.indexOf(">")+1);
-			System.out.println(geo[i]);
 			sparql+="?country ="+geo[i];
 		}
 		sparql+=" )}";
-		System.out.println(sparql);
 		ACLMessage message2 = new ACLMessage(ACLMessage.QUERY_REF);
 		message2.setConversationId("Capital");
-		message2.addReceiver(new AID("GeodataAgent", AID.ISLOCALNAME));
+		if(agent_to_communicate == null)
+		{
+			agent_to_communicate = RegisterToService.searchRegisteredAgent(myAgent, "SPARQLRequest", "GeoDB");
+		}
+		message2.addReceiver(agent_to_communicate);
 		message2.setContent(sparql);
-		message2.addReplyTo(new AID("PropagateSparqlAgent", AID.ISLOCALNAME));
+//		message2.addReplyTo(new AID("PropagateSparqlAgent", AID.ISLOCALNAME));
 		send(message2);
 		
 	}
@@ -149,4 +172,5 @@ public class getCapitalOfCountryBehaviour extends Behaviour{
 	}
 	
 }
+
 }
