@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Random;
+
 import sim.engine.SimState;
 import sim.engine.Stoppable;
 import sim.field.grid.ObjectGrid2D;
@@ -8,6 +10,7 @@ import sim.util.Int2D;
 
 public class Beings extends SimState {
 	
+	public static int NB_DIRECTIONS = 8;
 	public static int GRID_SIZE = 30; 
 	public static int NUM_INSECT = 10; 
 	public static int NUM_FOOD_CELL = 15; 
@@ -15,10 +18,11 @@ public class Beings extends SimState {
 	public static int MAX_LOAD = 5; 
 	public static int MAX_FOOD = 5; 
 	public static int FOOD_ENERGY = 3; 
-
 	public static int CAPACITY = 10;
+
 	public static SparseGrid2D sparse = new SparseGrid2D(GRID_SIZE,GRID_SIZE);
-	public Beings(long seed) {
+	
+public Beings(long seed) {
 		super(seed);
 	}
 	public void start() {
@@ -41,7 +45,7 @@ public class Beings extends SimState {
       a.stoppable = stoppable;
     }  
   }
-  private Int2D getAvailableFoodSpot(){
+  private  Int2D getAvailableFoodSpot(){
 	  Int2D location = new Int2D(random.nextInt(sparse.getWidth()),
 	           random.nextInt(sparse.getHeight()) );
 	  Object ag;
@@ -60,14 +64,14 @@ public class Beings extends SimState {
 	}
 	return location;
   }
-  private void addFood() {
+  public void addFood() {
 	  
 	for(int  i  =  0;  i  <  NUM_FOOD_CELL;  i++) {
       Food  b  =  new  Food();
-      Int2D location = getFreeLocation();
-      sparse.setObjectLocation(b,location.x,location.y);
+      Int2D location = getAvailableFoodSpot();
       b.x = location.x;
       b.y = location.y;
+      sparse.setObjectLocation(b,location.x,location.y);
     }  
   }
   public boolean free(int x,int y) {
@@ -75,7 +79,7 @@ public class Beings extends SimState {
 	 int yy = sparse.sty(y);
 	 return sparse.getObjectsAtLocation(xx, yy) == null;
   }
-  private Int2D getFreeLocation() {
+  public Int2D getFreeLocation() {
 	  Int2D location = new Int2D(random.nextInt(sparse.getWidth()),
 	           random.nextInt(sparse.getHeight()) );
 	  Object ag;
@@ -86,5 +90,9 @@ public class Beings extends SimState {
 	  return location;
   }
   public  int  getNumInsects()  {  return  NUM_INSECT;  }
+public static void decreaseFoodQuantity(int l, int c) {
+	// TODO Auto-generated method stub
+	Beings.sparse.removeObjectsAtLocation(sparse.getObjectsAtLocation(l, c));
+}
 
 }

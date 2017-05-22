@@ -3,9 +3,9 @@ package gui;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import model.AgentType;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.simple.OvalPortrayal2D;
-import tutorial.model.AgentType;
 
 public class StrangeOvalPortrayal extends OvalPortrayal2D {
 

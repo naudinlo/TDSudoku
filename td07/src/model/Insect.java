@@ -86,7 +86,8 @@ public class Insect implements Steppable{
 	}
 	private void decreaseFoodQuantity(int l, int c){
 		try {
-			((Food)(Beings.sparse.getObjectsAtLocation(l, c).clone())).decreaseQuantity();
+			((Food)(Beings.sparse.getObjectsAtLocation(l, c).clone())).decreaseQuantity(l,c);
+
 		} catch (CloneNotSupportedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

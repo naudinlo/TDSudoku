@@ -10,13 +10,12 @@ public class Food {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public void decreaseQuantity()
+	public void decreaseQuantity(int l, int c)
 	{
 		setQuantity(quantity-1);
 		if(quantity == 0)
 		{
-			Beings.sparse.removeObjectsAtLocation(this);
-			Beings.createNewFoodResource();
+			Beings.decreaseFoodQuantity(l,c);
 		}
 	}
 }
