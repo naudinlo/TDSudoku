@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="TDSudoku/src"/>
+	<classpathentry kind="lib" path="TDSudoku/lib/jackson-annotations-2.8.0.jar"/>
+	<classpathentry kind="lib" path="TDSudoku/lib/jackson-core-2.8.1.jar"/>
+	<classpathentry kind="lib" path="TDSudoku/lib/jackson-databind-2.8.1.jar"/>
+	<classpathentry kind="lib" path="TDSudoku/lib/jade4.3.3.jar" sourcepath="/home/aghiles/.m2/repository/net/sf/ingenias/jade/4.3/jade-4.3-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
